@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "sync_revision": "2026-07-19",
+  "canonical_template": "report-template.html",
+  "registry_path": "../Technical expert/ecosystem/registry.json",
+  "expected_workflow_count": 8,
+  "default_activation_file": "AGENTS.md",
+  "activation_file_overrides": {
+    "akagavin": "AGENT.md"
+  },
+  "required_marker": "GLOBAL_VISUAL_REPORT_TEMPLATE",
+  "required_skill": "$visual-report-template"
+}

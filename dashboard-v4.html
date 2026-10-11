@@ -1,0 +1,1637 @@
+<!doctype html>
+<html lang="zh-CN" data-mode="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Decision Studio v4</title>
+  <style>
+    :root {
+      --background: #f5f7f8;
+      --foreground: #182328;
+      --card: #ffffff;
+      --card-foreground: #182328;
+      --popover: #ffffff;
+      --popover-foreground: #182328;
+      --primary: #0f6670;
+      --primary-foreground: #ffffff;
+      --secondary: #eef2f3;
+      --secondary-foreground: #274148;
+      --accent: #e2f0f0;
+      --accent-foreground: #0f6670;
+      --muted: #eef2f3;
+      --muted-foreground: #5d6a70;
+      --destructive: #a34f48;
+      --destructive-foreground: #ffffff;
+      --border: #d8e0e3;
+      --input: #c4d0d4;
+      --ring: #2f7e87;
+      --success: #2f6b55;
+      --success-soft: #e4f1eb;
+      --warning: #8a681c;
+      --warning-soft: #fbf1d7;
+      --info: #3c6e87;
+      --info-soft: #e3eef4;
+      --chart-1: #0f6670;
+      --chart-2: #4d8790;
+      --chart-3: #83aab0;
+      --chart-4: #b6c9cc;
+      --chart-5: #d2dfe1;
+      --sidebar: #edf2f3;
+      --sidebar-foreground: #182328;
+      --sidebar-primary: #0f6670;
+      --sidebar-primary-foreground: #ffffff;
+      --sidebar-accent: #dfecee;
+      --sidebar-accent-foreground: #0f6670;
+      --sidebar-border: #d8e0e3;
+      --sidebar-ring: #2f7e87;
+      --font-sans: "Segoe UI Variable", "Microsoft YaHei UI", "PingFang SC", system-ui, sans-serif;
+      --font-serif: "Noto Serif SC", "Songti SC", serif;
+      --font-mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+      --base-size: 14px;
+      --line-height: 1.55;
+      --heading-weight: 720;
+      --letter-spacing: -0.01em;
+      --radius: 12px;
+      --control-radius: 8px;
+      --density: 1;
+      --content-width: 1520px;
+      --sidebar-width: 232px;
+      --shadow-color: rgba(24, 35, 40, .13);
+      --shadow-blur: 28px;
+      --shadow-y: 12px;
+      --grid-opacity: .12;
+      --motion-duration: .18s;
+      --page-pad: calc(28px * var(--density));
+    }
+
+    * { box-sizing: border-box; }
+    html { min-width: 320px; background: var(--background); scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--foreground);
+      background: var(--background);
+      font-family: var(--font-sans);
+      font-size: var(--base-size);
+      line-height: var(--line-height);
+      letter-spacing: var(--letter-spacing);
+      transition: background var(--motion-duration) ease, color var(--motion-duration) ease;
+    }
+    button, input, select, textarea { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { color: inherit; }
+    a { color: inherit; }
+    :focus-visible {
+      outline: 3px solid color-mix(in srgb, var(--ring) 45%, transparent);
+      outline-offset: 2px;
+    }
+    [hidden] { display: none !important; }
+    ::selection { color: var(--primary-foreground); background: var(--primary); }
+
+    .app-shell { min-height: 100dvh; }
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 40;
+      display: flex;
+      width: var(--sidebar-width);
+      flex-direction: column;
+      color: var(--sidebar-foreground);
+      background: var(--sidebar);
+      border-right: 1px solid var(--sidebar-border);
+    }
+    .brand {
+      display: flex;
+      min-height: 70px;
+      align-items: center;
+      gap: 11px;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--sidebar-border);
+    }
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 10px;
+      color: var(--primary-foreground);
+      background: var(--sidebar-primary);
+      font-size: 13px;
+      font-weight: 780;
+      letter-spacing: -.04em;
+    }
+    .brand-title { font-size: 13px; font-weight: 760; letter-spacing: -.02em; }
+    .brand-subtitle { margin-top: 2px; color: var(--muted-foreground); font-size: 10px; }
+    .sidebar-section { padding: 20px 12px 8px; }
+    .sidebar-label {
+      padding: 0 10px 8px;
+      color: var(--muted-foreground);
+      font-size: 10px;
+      font-weight: 760;
+      letter-spacing: .08em;
+    }
+    .nav-list { display: grid; gap: 3px; }
+    .nav-link {
+      display: grid;
+      min-height: 42px;
+      grid-template-columns: 28px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      padding: 0 10px;
+      border: 1px solid transparent;
+      border-radius: var(--control-radius);
+      color: var(--muted-foreground);
+      text-decoration: none;
+      transition: background var(--motion-duration) ease, color var(--motion-duration) ease, border-color var(--motion-duration) ease;
+    }
+    .nav-link:hover { color: var(--sidebar-foreground); background: var(--sidebar-accent); }
+    .nav-link[aria-current="page"] {
+      color: var(--sidebar-accent-foreground);
+      background: var(--sidebar-accent);
+      border-color: color-mix(in srgb, var(--sidebar-primary) 16%, var(--sidebar-border));
+      box-shadow: inset 2px 0 0 var(--sidebar-primary);
+    }
+    .nav-glyph {
+      color: var(--muted-foreground);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 760;
+      letter-spacing: -.02em;
+    }
+    .nav-link[aria-current="page"] .nav-glyph { color: var(--sidebar-primary); }
+    .nav-text { overflow: hidden; font-size: 12px; font-weight: 660; text-overflow: ellipsis; white-space: nowrap; }
+    .nav-count {
+      min-width: 22px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      color: var(--muted-foreground);
+      background: color-mix(in srgb, var(--sidebar-foreground) 7%, transparent);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-align: center;
+    }
+    .sidebar-context {
+      margin: 15px 14px 2px;
+      padding: 12px;
+      border: 1px solid var(--sidebar-border);
+      border-radius: var(--control-radius);
+      background: color-mix(in srgb, var(--sidebar-foreground) 3%, transparent);
+    }
+    .sidebar-context-title { margin-top: 5px; font-size: 12px; font-weight: 680; }
+    .sidebar-context-copy { margin-top: 6px; color: var(--muted-foreground); font-size: 10px; line-height: 1.45; }
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 15px 18px 18px;
+      border-top: 1px solid var(--sidebar-border);
+      color: var(--muted-foreground);
+      font-size: 10px;
+      line-height: 1.55;
+    }
+
+    .main-shell { min-height: 100dvh; margin-left: var(--sidebar-width); }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      display: flex;
+      min-height: 70px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 0 28px;
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--background) 90%, transparent);
+      backdrop-filter: blur(16px);
+    }
+    .topbar-left, .topbar-actions { display: flex; min-width: 0; align-items: center; gap: 10px; }
+    .breadcrumb-label { color: var(--muted-foreground); font-size: 10px; }
+    .breadcrumb-title { margin-top: 1px; font-size: 14px; font-weight: 720; letter-spacing: -.02em; }
+    .topbar-meta { color: var(--muted-foreground); font-size: 10px; white-space: nowrap; }
+    .button {
+      display: inline-flex;
+      min-height: 40px;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 13px;
+      border: 1px solid var(--border);
+      border-radius: var(--control-radius);
+      color: var(--foreground);
+      background: var(--card);
+      font-size: 12px;
+      font-weight: 680;
+      cursor: pointer;
+      transition: background var(--motion-duration) ease, border-color var(--motion-duration) ease, color var(--motion-duration) ease, transform var(--motion-duration) ease;
+    }
+    .button:hover { border-color: var(--ring); background: var(--accent); }
+    .button:active { transform: translateY(1px); }
+    .button-primary { color: var(--primary-foreground); border-color: var(--primary); background: var(--primary); }
+    .button-primary:hover { color: var(--primary-foreground); border-color: var(--primary); background: color-mix(in srgb, var(--primary) 88%, var(--foreground)); }
+    .button-quiet { border-color: transparent; background: transparent; }
+    .button-danger { color: var(--destructive); }
+    .button[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
+    .button-icon { width: 40px; padding: 0; }
+    .mode-toggle { display: inline-flex; padding: 3px; border: 1px solid var(--border); border-radius: 999px; background: var(--card); }
+    .mode-toggle button {
+      min-height: 30px;
+      padding: 0 9px;
+      border: 0;
+      border-radius: 999px;
+      color: var(--muted-foreground);
+      background: transparent;
+      font-size: 10px;
+      cursor: pointer;
+    }
+    .mode-toggle button[aria-pressed="true"] { color: var(--accent-foreground); background: var(--accent); }
+    .content { width: 100%; max-width: var(--content-width); margin: 0 auto; padding: var(--page-pad) var(--page-pad) 60px; }
+    .view { display: none; min-width: 0; }
+    .view.is-active { display: block; animation: view-in var(--motion-duration) ease both; }
+    @keyframes view-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .page-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 22px; margin-bottom: 24px; }
+    .page-heading h1 { margin: 0; font-size: clamp(28px, 3vw, 42px); font-weight: var(--heading-weight); line-height: 1.1; letter-spacing: -.055em; }
+    .page-heading p { max-width: 650px; margin: 9px 0 0; color: var(--muted-foreground); font-size: 13px; }
+    .heading-meta { color: var(--muted-foreground); font-family: var(--font-mono); font-size: 10px; text-align: right; white-space: nowrap; }
+    .eyebrow { color: var(--primary); font-size: 10px; font-weight: 780; letter-spacing: .08em; }
+    .surface {
+      min-width: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card);
+    }
+    .surface-elevated {
+      box-shadow: 0 var(--shadow-y) var(--shadow-blur) var(--shadow-color);
+    }
+    .surface-head {
+      display: flex;
+      min-height: 54px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .surface-head h2 { margin: 0; font-size: 13px; font-weight: 740; letter-spacing: -.02em; }
+    .surface-note { color: var(--muted-foreground); font-size: 10px; }
+    .surface-body { padding: 18px; }
+    .subtle { color: var(--muted-foreground); }
+    .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+    .decision-hero {
+      display: grid;
+      min-height: 322px;
+      grid-template-columns: minmax(0, 1.35fr) minmax(300px, .65fr);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: 0 var(--shadow-y) var(--shadow-blur) var(--shadow-color);
+    }
+    .decision-copy { display: flex; flex-direction: column; justify-content: space-between; padding: 30px 32px; }
+    .decision-copy h2 { max-width: 690px; margin: 12px 0 0; font-size: clamp(28px, 3.2vw, 48px); font-weight: 790; line-height: 1.08; letter-spacing: -.065em; }
+    .decision-copy p { max-width: 680px; margin: 14px 0 0; color: var(--muted-foreground); font-size: 14px; line-height: 1.65; }
+    .decision-action {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 26px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+    .decision-action strong { display: block; font-size: 13px; }
+    .decision-action span { display: block; margin-top: 3px; color: var(--muted-foreground); font-size: 11px; }
+    .decision-side {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 28px;
+      border-left: 1px solid var(--border);
+      background: var(--accent);
+    }
+    .score-label { color: var(--muted-foreground); font-size: 11px; font-weight: 680; }
+    .score { margin-top: 7px; font-family: var(--font-mono); font-size: 66px; font-weight: 720; line-height: 1; letter-spacing: -.09em; }
+    .score small { margin-left: 5px; color: var(--muted-foreground); font-size: 14px; letter-spacing: 0; }
+    .score-caption { max-width: 250px; margin-top: 12px; color: var(--muted-foreground); font-size: 11px; line-height: 1.55; }
+    .score-facts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; margin-top: 24px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--control-radius); background: var(--border); }
+    .score-fact { min-width: 0; padding: 11px 10px; background: var(--card); }
+    .score-fact span { display: block; color: var(--muted-foreground); font-size: 9px; }
+    .score-fact strong { display: block; margin-top: 3px; font-family: var(--font-mono); font-size: 13px; }
+
+    .signal-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 18px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .signal { min-height: 116px; padding: 18px 20px 16px; border-right: 1px solid var(--border); }
+    .signal:last-child { border-right: 0; }
+    .signal-label { color: var(--muted-foreground); font-size: 10px; font-weight: 700; }
+    .signal-value { margin-top: 9px; font-family: var(--font-mono); font-size: 29px; font-weight: 720; line-height: 1; letter-spacing: -.07em; }
+    .signal-copy { margin-top: 7px; color: var(--muted-foreground); font-size: 10px; }
+
+    .section-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr); gap: 18px; margin-top: 24px; }
+    .evidence-chain { display: grid; gap: 0; }
+    .evidence-item { display: grid; grid-template-columns: 116px minmax(0, 1fr) 120px; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+    .evidence-item:last-child { border-bottom: 0; }
+    .evidence-kind { color: var(--primary); font-size: 10px; font-weight: 760; }
+    .evidence-title { font-size: 12px; font-weight: 700; }
+    .evidence-copy { margin-top: 4px; color: var(--muted-foreground); font-size: 10px; line-height: 1.5; }
+    .evidence-source { color: var(--muted-foreground); font-family: var(--font-mono); font-size: 9px; text-align: right; }
+    .risk-action-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; margin-top: 18px; }
+    .risk-callout { padding: 18px; border-left: 3px solid var(--destructive); background: color-mix(in srgb, var(--destructive) 8%, var(--card)); }
+    .risk-callout h3 { margin: 8px 0 0; font-size: 15px; letter-spacing: -.025em; }
+    .risk-callout p { margin: 8px 0 0; color: var(--muted-foreground); font-size: 11px; line-height: 1.55; }
+    .risk-trigger { display: inline-flex; margin-top: 16px; padding: 5px 8px; border-radius: 6px; color: var(--destructive); background: color-mix(in srgb, var(--destructive) 12%, transparent); font-family: var(--font-mono); font-size: 9px; }
+    .action-list { display: grid; gap: 0; }
+    .action-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 13px 0; border-bottom: 1px solid var(--border); }
+    .action-row:last-child { border-bottom: 0; }
+    .action-index { color: var(--primary); font-family: var(--font-mono); font-size: 10px; font-weight: 720; }
+    .action-title { font-size: 11px; font-weight: 700; }
+    .action-meta { margin-top: 3px; color: var(--muted-foreground); font-size: 9px; }
+    .status {
+      display: inline-flex;
+      min-height: 22px;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 7px;
+      border-radius: 6px;
+      color: var(--muted-foreground);
+      background: var(--muted);
+      font-size: 9px;
+      font-weight: 720;
+      white-space: nowrap;
+    }
+    .status-success { color: var(--success); background: var(--success-soft); }
+    .status-warning { color: var(--warning); background: var(--warning-soft); }
+    .status-danger { color: var(--destructive); background: color-mix(in srgb, var(--destructive) 12%, transparent); }
+    .status-info { color: var(--info); background: var(--info-soft); }
+
+    .chart-surface { margin-top: 24px; }
+    .chart { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: end; gap: 14px; height: 170px; padding: 16px 5px 0; border-bottom: 1px solid var(--border); background-image: linear-gradient(to bottom, color-mix(in srgb, var(--border) calc(var(--grid-opacity) * 100%), transparent) 1px, transparent 1px); background-size: 100% 25%; }
+    .chart-column { display: flex; height: 100%; flex-direction: column; align-items: center; justify-content: flex-end; }
+    .chart-value { margin-bottom: 6px; color: var(--muted-foreground); font-family: var(--font-mono); font-size: 9px; }
+    .chart-bar { width: min(34px, 68%); height: var(--bar-height); min-height: 7px; border-radius: 6px 6px 2px 2px; background: var(--chart-4); }
+    .chart-column:last-child .chart-bar { background: var(--chart-1); }
+    .chart-label { margin-top: 8px; color: var(--muted-foreground); font-size: 9px; }
+
+    .table-wrap { overflow-x: auto; }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .data-table th { height: 38px; padding: 0 12px; color: var(--muted-foreground); background: var(--muted); font-size: 9px; font-weight: 740; text-align: left; white-space: nowrap; }
+    .data-table td { padding: 13px 12px; border-top: 1px solid var(--border); vertical-align: top; }
+    .data-table tbody tr:hover { background: var(--accent); }
+    .data-table .title { min-width: 190px; font-weight: 700; }
+    .data-table .note { min-width: 220px; color: var(--muted-foreground); line-height: 1.5; }
+    .route-stack { display: grid; gap: 18px; }
+    .route-intro { display: flex; align-items: end; justify-content: space-between; gap: 20px; }
+    .route-intro h1 { margin: 0; font-size: 30px; letter-spacing: -.05em; }
+    .route-intro p { max-width: 640px; margin: 7px 0 0; color: var(--muted-foreground); font-size: 12px; }
+    .metric-inline { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--border); }
+    .metric-inline-item { padding: 16px 18px; border-right: 1px solid var(--border); }
+    .metric-inline-item:last-child { border-right: 0; }
+    .metric-inline-label { color: var(--muted-foreground); font-size: 9px; }
+    .metric-inline-value { margin-top: 6px; font-family: var(--font-mono); font-size: 22px; font-weight: 720; letter-spacing: -.06em; }
+
+    .studio-shell { display: grid; grid-template-columns: 280px minmax(0, 1fr) 264px; gap: 16px; align-items: start; }
+    .studio-pane { min-width: 0; }
+    .studio-panel { overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); }
+    .studio-panel-head { display: flex; min-height: 53px; align-items: center; justify-content: space-between; gap: 10px; padding: 0 15px; border-bottom: 1px solid var(--border); }
+    .studio-panel-head h2 { margin: 0; font-size: 12px; font-weight: 760; }
+    .studio-panel-body { padding: 14px; }
+    .studio-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; padding: 5px; border-bottom: 1px solid var(--border); background: var(--muted); }
+    .studio-tab {
+      min-height: 32px;
+      padding: 0 5px;
+      border: 0;
+      border-radius: 6px;
+      color: var(--muted-foreground);
+      background: transparent;
+      font-size: 9px;
+      font-weight: 720;
+      cursor: pointer;
+    }
+    .studio-tab[aria-selected="true"] { color: var(--accent-foreground); background: var(--card); box-shadow: 0 1px 2px var(--shadow-color); }
+    .palette-switch { display: flex; gap: 5px; margin-bottom: 13px; }
+    .palette-switch button {
+      flex: 1;
+      min-height: 29px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted-foreground);
+      background: var(--card);
+      font-size: 9px;
+      cursor: pointer;
+    }
+    .palette-switch button[aria-pressed="true"] { color: var(--primary-foreground); border-color: var(--primary); background: var(--primary); }
+    .control-search {
+      width: 100%;
+      min-height: 36px;
+      margin-bottom: 13px;
+      padding: 0 10px;
+      border: 1px solid var(--input);
+      border-radius: var(--control-radius);
+      color: var(--foreground);
+      background: var(--background);
+      font-size: 11px;
+    }
+    .control-group { display: grid; gap: 9px; margin-top: 18px; }
+    .control-group:first-child { margin-top: 0; }
+    .control-group h3 { margin: 0; color: var(--muted-foreground); font-size: 9px; font-weight: 780; letter-spacing: .08em; }
+    .color-control { display: grid; grid-template-columns: minmax(0, 1fr) 30px; gap: 8px; align-items: center; }
+    .color-control label { min-width: 0; }
+    .token-label { display: block; overflow: hidden; font-size: 10px; font-weight: 680; text-overflow: ellipsis; white-space: nowrap; }
+    .token-key { display: block; margin-top: 1px; overflow: hidden; color: var(--muted-foreground); font-family: var(--font-mono); font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+    .color-input {
+      width: 30px;
+      height: 30px;
+      padding: 2px;
+      border: 1px solid var(--input);
+      border-radius: 7px;
+      background: var(--card);
+      cursor: pointer;
+    }
+    .control-text, .control-select, .control-number {
+      width: 100%;
+      min-height: 34px;
+      margin-top: 5px;
+      padding: 0 8px;
+      border: 1px solid var(--input);
+      border-radius: 6px;
+      color: var(--foreground);
+      background: var(--background);
+      font-size: 10px;
+    }
+    .range-control { display: grid; grid-template-columns: minmax(0, 1fr) 42px; gap: 8px; align-items: center; }
+    .range-control input[type="range"] { width: 100%; accent-color: var(--primary); }
+    .range-value { color: var(--primary); font-family: var(--font-mono); font-size: 9px; text-align: right; }
+    .control-help { margin: -3px 0 0; color: var(--muted-foreground); font-size: 9px; line-height: 1.45; }
+    .preview-stage {
+      min-height: 850px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--background);
+    }
+    .preview-toolbar {
+      display: flex;
+      min-height: 52px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--card);
+    }
+    .preview-title { font-size: 11px; font-weight: 740; }
+    .preview-switch { display: flex; gap: 3px; padding: 3px; border-radius: 7px; background: var(--muted); }
+    .preview-switch button {
+      min-height: 27px;
+      padding: 0 8px;
+      border: 0;
+      border-radius: 5px;
+      color: var(--muted-foreground);
+      background: transparent;
+      font-size: 9px;
+      cursor: pointer;
+    }
+    .preview-switch button[aria-selected="true"] { color: var(--accent-foreground); background: var(--card); }
+    .preview-canvas { padding: 18px; }
+    .preview-canvas .decision-hero { grid-template-columns: minmax(0, 1.2fr) minmax(190px, .8fr); min-height: 210px; box-shadow: none; }
+    .preview-canvas .decision-copy { padding: 20px; }
+    .preview-canvas .decision-copy h2 { margin-top: 7px; font-size: 25px; }
+    .preview-canvas .decision-copy p { margin-top: 8px; font-size: 10px; line-height: 1.5; }
+    .preview-canvas .decision-action { margin-top: 12px; padding-top: 11px; }
+    .preview-canvas .decision-action strong { font-size: 10px; }
+    .preview-canvas .decision-action span { font-size: 8px; }
+    .preview-canvas .decision-side { padding: 20px; }
+    .preview-canvas .score { font-size: 43px; }
+    .preview-canvas .score-caption { font-size: 8px; }
+    .preview-canvas .score-facts { margin-top: 12px; }
+    .preview-canvas .score-fact { padding: 7px; }
+    .preview-canvas .score-fact span { font-size: 7px; }
+    .preview-canvas .score-fact strong { font-size: 10px; }
+    .preview-canvas .signal-row { margin-top: 12px; }
+    .preview-canvas .signal { min-height: 73px; padding: 11px; }
+    .preview-canvas .signal-label { font-size: 8px; }
+    .preview-canvas .signal-value { margin-top: 5px; font-size: 19px; }
+    .preview-canvas .signal-copy { margin-top: 3px; font-size: 7px; }
+    .preview-canvas .section-grid { gap: 12px; margin-top: 14px; }
+    .preview-canvas .surface-head { min-height: 38px; padding: 0 11px; }
+    .preview-canvas .surface-head h2 { font-size: 9px; }
+    .preview-canvas .surface-note { font-size: 7px; }
+    .preview-canvas .surface-body { padding: 11px; }
+    .preview-canvas .evidence-item { grid-template-columns: 58px minmax(0, 1fr); gap: 8px; padding: 9px 0; }
+    .preview-canvas .evidence-kind { font-size: 7px; }
+    .preview-canvas .evidence-title { font-size: 8px; }
+    .preview-canvas .evidence-copy { margin-top: 2px; font-size: 7px; }
+    .preview-canvas .evidence-source { display: none; }
+    .preview-canvas .risk-action-grid { gap: 12px; margin-top: 12px; }
+    .preview-canvas .action-row { grid-template-columns: 16px minmax(0, 1fr) auto; gap: 6px; padding: 8px 0; }
+    .preview-canvas .action-index { font-size: 7px; }
+    .preview-canvas .action-title { font-size: 8px; }
+    .preview-canvas .action-meta { font-size: 7px; }
+    .preview-canvas .status { min-height: 17px; padding: 1px 5px; font-size: 7px; }
+    .preview-canvas .risk-callout { padding: 11px; }
+    .preview-canvas .risk-callout h3 { margin-top: 5px; font-size: 10px; }
+    .preview-canvas .risk-callout p { margin-top: 5px; font-size: 7px; }
+    .preview-canvas .risk-trigger { margin-top: 8px; font-size: 7px; }
+    .component-lab { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+    .component-sample { padding: 12px; border: 1px solid var(--border); border-radius: var(--control-radius); background: var(--card); }
+    .component-sample h3 { margin: 0 0 8px; font-size: 9px; }
+    .sample-input { width: 100%; min-height: 30px; padding: 0 8px; border: 1px solid var(--input); border-radius: 6px; color: var(--foreground); background: var(--background); font-size: 9px; }
+    .sample-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+    .sample-button { min-height: 28px; padding: 0 8px; border: 1px solid var(--border); border-radius: 6px; color: var(--foreground); background: var(--secondary); font-size: 8px; font-weight: 700; }
+    .sample-button.primary { color: var(--primary-foreground); border-color: var(--primary); background: var(--primary); }
+    .sample-button.danger { color: var(--destructive-foreground); border-color: var(--destructive); background: var(--destructive); }
+    .inspector-list { display: grid; gap: 0; }
+    .inspector-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--border); }
+    .inspector-row:last-child { border-bottom: 0; }
+    .inspector-name { font-size: 10px; font-weight: 680; }
+    .inspector-value { max-width: 108px; overflow: hidden; color: var(--primary); font-family: var(--font-mono); font-size: 8px; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
+    .check-list { display: grid; gap: 9px; }
+    .check-item { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 8px; align-items: start; color: var(--muted-foreground); font-size: 9px; line-height: 1.45; }
+    .check-mark { display: grid; width: 16px; height: 16px; place-items: center; border-radius: 50%; color: var(--success); background: var(--success-soft); font-size: 9px; font-weight: 800; }
+    .check-item.warning .check-mark { color: var(--warning); background: var(--warning-soft); }
+    .theme-summary { padding: 12px; border-radius: var(--control-radius); background: var(--accent); }
+    .theme-summary strong { display: block; font-size: 11px; }
+    .theme-summary span { display: block; margin-top: 3px; color: var(--muted-foreground); font-size: 9px; }
+    .preset-list { display: grid; gap: 6px; margin-top: 12px; }
+    .preset-button { display: flex; min-height: 35px; align-items: center; justify-content: space-between; gap: 8px; padding: 0 9px; border: 1px solid var(--border); border-radius: 7px; color: var(--foreground); background: var(--card); font-size: 9px; cursor: pointer; }
+    .preset-button:hover { border-color: var(--ring); background: var(--accent); }
+    .preset-dot { width: 18px; height: 18px; flex: 0 0 auto; border-radius: 50%; background: var(--preset-color); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--card) 70%, transparent); }
+    .dialog {
+      width: min(560px, calc(100vw - 32px));
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--foreground);
+      background: var(--card);
+      box-shadow: 0 34px 90px var(--shadow-color);
+    }
+    .dialog::backdrop { background: color-mix(in srgb, var(--foreground) 32%, transparent); backdrop-filter: blur(4px); }
+    .dialog-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid var(--border); }
+    .dialog-head h2 { margin: 0; font-size: 15px; }
+    .dialog-body { padding: 18px; }
+    .dialog-body textarea { width: 100%; min-height: 250px; padding: 12px; border: 1px solid var(--input); border-radius: var(--control-radius); color: var(--foreground); background: var(--background); font-family: var(--font-mono); font-size: 10px; line-height: 1.5; resize: vertical; }
+    .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+    .toast {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 100;
+      max-width: 320px;
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--control-radius);
+      color: var(--foreground);
+      background: var(--card);
+      box-shadow: 0 12px 32px var(--shadow-color);
+      font-size: 11px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity var(--motion-duration) ease, transform var(--motion-duration) ease;
+    }
+    .toast.is-visible { opacity: 1; transform: translateY(0); }
+    .mobile-menu { display: none; }
+
+    @media (max-width: 1180px) {
+      .studio-shell { grid-template-columns: 250px minmax(0, 1fr); }
+      .studio-shell > .inspector-pane { grid-column: 1 / -1; }
+      .inspector-pane .studio-panel { display: grid; grid-template-columns: 1fr 1fr; }
+      .inspector-pane .studio-panel-head { border-right: 1px solid var(--border); border-bottom: 0; }
+      .inspector-pane .studio-panel-body { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    }
+    @media (max-width: 860px) {
+      .sidebar { transform: translateX(-100%); transition: transform var(--motion-duration) ease; }
+      body.nav-open .sidebar { transform: translateX(0); box-shadow: 18px 0 52px var(--shadow-color); }
+      .main-shell { margin-left: 0; }
+      .mobile-menu { display: inline-flex; }
+      .topbar { padding: 0 16px; }
+      .topbar-meta { display: none; }
+      .content { padding: 22px 16px 46px; }
+      .decision-hero { grid-template-columns: 1fr; }
+      .decision-side { border-top: 1px solid var(--border); border-left: 0; }
+      .section-grid, .risk-action-grid { grid-template-columns: 1fr; }
+      .studio-shell { grid-template-columns: 1fr; }
+      .studio-shell > .inspector-pane { grid-column: auto; }
+      .inspector-pane .studio-panel { display: block; }
+      .inspector-pane .studio-panel-head { border-right: 0; border-bottom: 1px solid var(--border); }
+      .inspector-pane .studio-panel-body { display: block; }
+      .preview-stage { min-height: auto; }
+      .preview-canvas .decision-hero { grid-template-columns: 1fr; }
+      .preview-canvas .decision-side { border-top: 1px solid var(--border); border-left: 0; }
+      .page-heading { display: block; }
+      .heading-meta { margin-top: 12px; text-align: left; }
+    }
+    @media (max-width: 560px) {
+      .topbar { min-height: 62px; }
+      .topbar-actions .button-quiet { display: none; }
+      .breadcrumb-title { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .decision-copy { padding: 24px 20px; }
+      .decision-copy h2 { font-size: 31px; }
+      .decision-side { padding: 22px 20px; }
+      .signal-row { grid-template-columns: 1fr; }
+      .signal { min-height: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+      .signal:last-child { border-bottom: 0; }
+      .evidence-item { grid-template-columns: 1fr; gap: 5px; }
+      .evidence-source { text-align: left; }
+      .metric-inline { grid-template-columns: 1fr 1fr; }
+      .metric-inline-item:nth-child(2n) { border-right: 0; }
+      .metric-inline-item:nth-child(-n+2) { border-bottom: 1px solid var(--border); }
+      .component-lab { grid-template-columns: 1fr; }
+      .preview-toolbar { align-items: flex-start; flex-direction: column; padding: 11px 12px; }
+      .preview-canvas { padding: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+    html[data-motion="none"] *, html[data-motion="none"] *::before, html[data-motion="none"] *::after {
+      animation-duration: .01ms !important;
+      transition-duration: .01ms !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="主导航">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">DS</div>
+        <div>
+          <div class="brand-title">Decision Studio</div>
+          <div class="brand-subtitle">可调主题的决策工作台</div>
+        </div>
+      </div>
+      <div class="sidebar-context">
+        <div class="eyebrow">REFERENCE DATA</div>
+        <div class="sidebar-context-title">工作流决策样本</div>
+        <div class="sidebar-context-copy">当前数据、算法和旧模板仅用于展示参考，不写回来源。</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">WORKSPACE</div>
+        <nav class="nav-list">
+          <a class="nav-link" href="#/overview" data-route-link="overview"><span class="nav-glyph">OV</span><span class="nav-text">决策概览</span></a>
+          <a class="nav-link" href="#/evidence" data-route-link="evidence"><span class="nav-glyph">EV</span><span class="nav-text">证据链</span><span class="nav-count">4</span></a>
+          <a class="nav-link" href="#/risk" data-route-link="risk"><span class="nav-glyph">RK</span><span class="nav-text">风险与推翻条件</span><span class="nav-count">3</span></a>
+          <a class="nav-link" href="#/execution" data-route-link="execution"><span class="nav-glyph">EX</span><span class="nav-text">下一步行动</span><span class="nav-count">3</span></a>
+        </nav>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">STUDIO</div>
+        <nav class="nav-list">
+          <a class="nav-link" href="#/theme" data-route-link="theme"><span class="nav-glyph">TH</span><span class="nav-text">Theme Studio</span></a>
+        </nav>
+      </div>
+      <div class="sidebar-footer">主题只保存到本浏览器<br>不保存报告数据和来源内容</div>
+    </aside>
+
+    <main class="main-shell">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="button button-icon mobile-menu" type="button" data-action="toggle-nav" aria-label="打开导航">☰</button>
+          <div>
+            <div class="breadcrumb-label">DECISION STUDIO / <span id="route-label">OVERVIEW</span></div>
+            <div class="breadcrumb-title" id="topbar-title">决策概览</div>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <span class="topbar-meta" id="autosave-status">主题未修改</span>
+          <div class="mode-toggle" aria-label="主题模式">
+            <button type="button" data-mode-choice="light">亮色</button>
+            <button type="button" data-mode-choice="dark">暗色</button>
+            <button type="button" data-mode-choice="auto">自动</button>
+          </div>
+          <button class="button button-quiet" type="button" data-action="open-theme">编辑主题</button>
+          <button class="button button-primary" type="button" data-action="open-export">导出主题</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="view is-active" id="view-overview">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">REFERENCE WORKFLOW / OVERVIEW</div>
+              <h1>现在应该做什么</h1>
+              <p>把最终决策、成立理由、最大风险和下一步行动放在同一条阅读路径上。</p>
+            </div>
+            <div class="heading-meta">演示数据<br>2026-07-05 14:30</div>
+          </div>
+
+          <article class="decision-hero">
+            <div class="decision-copy">
+              <div>
+                <div class="eyebrow">RECOMMENDED DECISION</div>
+                <h2>方案甲：小范围验证后扩展</h2>
+                <p>先在可控范围内验证真实反馈，再决定是否扩大。这个选择把影响力、可验证性和失败成本放在同一个判断框架里。</p>
+              </div>
+              <div class="decision-action">
+                <div>
+                  <strong>下一步：启动 48 小时验证窗口</strong>
+                  <span>失败时回滚到方案丙，不改变原始来源。</span>
+                </div>
+                <button class="button button-primary" type="button" data-action="open-theme">调整主题</button>
+              </div>
+            </div>
+            <div class="decision-side">
+              <div>
+                <div class="score-label">推荐方案综合得分</div>
+                <div class="score">87<small>/100</small></div>
+                <div class="score-caption">领先第二名 15 分。权重扰动测试稳定率 82%，当前推荐对评分偏好较稳定。</div>
+              </div>
+              <div class="score-facts">
+                <div class="score-fact"><span>置信区间</span><strong>83-91</strong></div>
+                <div class="score-fact"><span>证据覆盖</span><strong>7/9</strong></div>
+                <div class="score-fact"><span>信号窗口</span><strong>48h</strong></div>
+                <div class="score-fact"><span>影响分位</span><strong>P80</strong></div>
+              </div>
+            </div>
+          </article>
+
+          <div class="signal-row">
+            <div class="signal"><div class="signal-label">决策置信度</div><div class="signal-value">86</div><div class="signal-copy">较上次 +8，仍有两个开放问题</div></div>
+            <div class="signal"><div class="signal-label">证据覆盖</div><div class="signal-value">7/9</div><div class="signal-copy">两项证据缺口，一项存在冲突</div></div>
+            <div class="signal"><div class="signal-label">可回滚性</div><div class="signal-value">94</div><div class="signal-copy">保留快照和输出文件即可回退</div></div>
+          </div>
+
+          <div class="section-grid">
+            <article class="surface">
+              <div class="surface-head"><h2>为什么这个决策成立</h2><span class="surface-note">主张 → 证据 → 限制</span></div>
+              <div class="surface-body evidence-chain">
+                <div class="evidence-item"><div class="evidence-kind">主张 01</div><div><div class="evidence-title">小范围验证能降低失败成本</div><div class="evidence-copy">先取得真实反馈，再扩大范围。全面替换的潜在收益更高，但当前验证成本和失败代价都过大。</div></div><div class="evidence-source">决策分析<br>2026-07-05</div></div>
+                <div class="evidence-item"><div class="evidence-kind">主张 02</div><div><div class="evidence-title">回滚路径已经具备</div><div class="evidence-copy">原始快照、输出文件和停止条件已被记录，执行可以在信号恶化时中止。</div></div><div class="evidence-source">来源审计<br>只读</div></div>
+                <div class="evidence-item"><div class="evidence-kind">限制</div><div><div class="evidence-title">证据覆盖仍不是完整状态</div><div class="evidence-copy">上游字段结构还需要补充校验，不能把 86 分理解成确定性结论。</div></div><div class="evidence-source">开放问题<br>2 项</div></div>
+              </div>
+            </article>
+            <article class="surface">
+              <div class="surface-head"><h2>下一步行动</h2><span class="surface-note">按优先级</span></div>
+              <div class="surface-body action-list">
+                <div class="action-row"><div class="action-index">01</div><div><div class="action-title">确认最终视觉方向</div><div class="action-meta">负责人：创建人 · 今天</div></div><span class="status status-info">复核</span></div>
+                <div class="action-row"><div class="action-index">02</div><div><div class="action-title">补齐主题编辑器预览</div><div class="action-meta">负责人：工作流 · 下一次运行</div></div><span class="status status-success">计划中</span></div>
+                <div class="action-row"><div class="action-index">03</div><div><div class="action-title">检查自动保存边界</div><div class="action-meta">负责人：系统 · 发布前</div></div><span class="status status-warning">待处理</span></div>
+              </div>
+            </article>
+          </div>
+
+          <article class="surface chart-surface">
+            <div class="surface-head"><h2>置信度轨迹</h2><span class="surface-note">只展示真实历史样本</span></div>
+            <div class="surface-body">
+              <div class="chart">
+                <div class="chart-column"><div class="chart-value">72</div><div class="chart-bar" style="--bar-height: 54%"></div><div class="chart-label">T-5</div></div>
+                <div class="chart-column"><div class="chart-value">75</div><div class="chart-bar" style="--bar-height: 60%"></div><div class="chart-label">T-4</div></div>
+                <div class="chart-column"><div class="chart-value">77</div><div class="chart-bar" style="--bar-height: 66%"></div><div class="chart-label">T-3</div></div>
+                <div class="chart-column"><div class="chart-value">81</div><div class="chart-bar" style="--bar-height: 76%"></div><div class="chart-label">T-2</div></div>
+                <div class="chart-column"><div class="chart-value">83</div><div class="chart-bar" style="--bar-height: 82%"></div><div class="chart-label">T-1</div></div>
+                <div class="chart-column"><div class="chart-value">86</div><div class="chart-bar" style="--bar-height: 92%"></div><div class="chart-label">当前</div></div>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="view" id="view-evidence">
+          <div class="route-intro"><div><div class="eyebrow">EVIDENCE LEDGER</div><h1>证据链</h1><p>每个判断都要同时显示来源、质量、时间和限制。</p></div><div class="heading-meta">4 条记录</div></div>
+          <article class="surface route-stack" style="margin-top:24px">
+            <div class="metric-inline"><div class="metric-inline-item"><div class="metric-inline-label">证据覆盖</div><div class="metric-inline-value">7/9</div></div><div class="metric-inline-item"><div class="metric-inline-label">高质量证据</div><div class="metric-inline-value">3</div></div><div class="metric-inline-item"><div class="metric-inline-label">冲突证据</div><div class="metric-inline-value">1</div></div><div class="metric-inline-item"><div class="metric-inline-label">过期证据</div><div class="metric-inline-value">0</div></div></div>
+            <div class="table-wrap"><table class="data-table"><thead><tr><th>主张</th><th>来源</th><th>质量</th><th>更新时间</th><th>限制</th></tr></thead><tbody>
+              <tr><td class="title">只读边界可以由模板层约束</td><td>模板静态扫描</td><td><span class="status status-success">高</span></td><td class="mono">2026-07-05</td><td class="note">上游采集脚本仍需单独遵守只读规则。</td></tr>
+              <tr><td class="title">报告需要更细颗粒度数据</td><td>结构审查</td><td><span class="status status-success">高</span></td><td class="mono">2026-07-05</td><td class="note">不同工作流的字段名称还需要适配。</td></tr>
+              <tr><td class="title">背景色应该降低饱和度</td><td>视觉自检</td><td><span class="status status-info">中</span></td><td class="mono">2026-07-05</td><td class="note">最终审美仍需由使用者确认。</td></tr>
+              <tr><td class="title">主题编辑器需要真实组件预览</td><td>TweakCN 参考</td><td><span class="status status-success">高</span></td><td class="mono">当前</td><td class="note">新看板必须覆盖表格、图表、表单和弹窗。</td></tr>
+            </tbody></table></div>
+          </article>
+        </section>
+
+        <section class="view" id="view-risk">
+          <div class="route-intro"><div><div class="eyebrow">REVERSAL CONDITIONS</div><h1>风险与推翻条件</h1><p>风险不是装饰性色块，而是决定什么时候停止或回滚的规则。</p></div><div class="heading-meta">3 项风险</div></div>
+          <div class="risk-action-grid">
+            <article class="surface risk-callout"><div class="eyebrow" style="color:var(--destructive)">HIGHEST RISK</div><h3>结论看似确定，但证据还不够完整</h3><p>如果信号窗口内出现新的冲突证据，或者置信度降到 70 以下，当前推荐应暂停并重新审查。</p><span class="risk-trigger">推翻条件：置信度 &lt; 70</span></article>
+            <article class="surface"><div class="surface-head"><h2>风险矩阵摘要</h2><span class="surface-note">原始与残余暴露</span></div><div class="surface-body action-list"><div class="action-row"><div class="action-index">01</div><div><div class="action-title">上游数据结构不统一</div><div class="action-meta">残余暴露 2 · 负责人：工作流</div></div><span class="status status-warning">观察</span></div><div class="action-row"><div class="action-index">02</div><div><div class="action-title">证据不足导致过度确定</div><div class="action-meta">残余暴露 2 · 负责人：报告</div></div><span class="status status-danger">高风险</span></div><div class="action-row"><div class="action-index">03</div><div><div class="action-title">报告被误用为数据源</div><div class="action-meta">残余暴露 1 · 负责人：系统</div></div><span class="status status-info">受控</span></div></div></article>
+          </div>
+          <article class="surface" style="margin-top:18px"><div class="surface-head"><h2>风险登记表</h2><span class="surface-note">只展示判断所需字段</span></div><div class="table-wrap"><table class="data-table"><thead><tr><th>风险</th><th>严重度</th><th>概率</th><th>残余暴露</th><th>触发条件</th><th>缓解动作</th></tr></thead><tbody><tr><td class="title">上游数据结构不统一</td><td>中</td><td>中</td><td class="mono">2/9</td><td class="note">字段缺失或语义不一致</td><td class="note">输出前转换成标准结构</td></tr><tr><td class="title">证据不足导致过度确定</td><td><span class="status status-danger">高</span></td><td>低</td><td class="mono">2/9</td><td class="note">置信度低于 70</td><td class="note">显示证据覆盖和开放问题</td></tr><tr><td class="title">报告被误用为数据源</td><td>中</td><td>低</td><td class="mono">1/9</td><td class="note">尝试写回源目录</td><td class="note">保持输出物归档，不开放写回</td></tr></tbody></table></div></article>
+        </section>
+
+        <section class="view" id="view-execution">
+          <div class="route-intro"><div><div class="eyebrow">ACTION QUEUE</div><h1>下一步行动</h1><p>每一个行动都需要负责人、时间、成功标准和回滚条件。</p></div><div class="heading-meta">3 项行动</div></div>
+          <article class="surface" style="margin-top:24px"><div class="surface-head"><h2>执行队列</h2><span class="surface-note">按优先级排序</span></div><div class="table-wrap"><table class="data-table"><thead><tr><th>行动</th><th>负责人</th><th>截止</th><th>状态</th><th>下一信号</th><th>回滚条件</th></tr></thead><tbody><tr><td class="title">确认最终视觉方向</td><td>创建人</td><td>今天</td><td><span class="status status-info">复核</span></td><td class="note">确认 Theme Studio 是否进入同步阶段</td><td class="note">核心结论仍需滚动查找</td></tr><tr><td class="title">适配结构化输出</td><td>工作流</td><td>下一次运行</td><td><span class="status status-success">计划中</span></td><td class="note">第一份真实结构化样本通过渲染</td><td class="note">关键字段无法稳定映射</td></tr><tr><td class="title">检查来源完整性</td><td>系统</td><td>发布前</td><td><span class="status status-warning">待处理</span></td><td class="note">所有来源都有检查时间和权限</td><td class="note">来源权限状态缺失</td></tr></tbody></table></div></article>
+        </section>
+
+        <section class="view" id="view-theme">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">THEME STUDIO / LIVE PREVIEW</div>
+              <h1>让看板跟着你的视觉判断变化</h1>
+              <p>所有视觉参数都作用于真实看板预览。主题只保存到本浏览器，不改变算法、报告数据或旧模板。</p>
+            </div>
+            <div class="heading-meta" id="theme-updated-meta">自动保存开启</div>
+          </div>
+          <div class="studio-shell">
+            <section class="studio-pane">
+              <div class="studio-panel">
+                <div class="studio-panel-head"><h2>主题控制台</h2><span class="surface-note" id="edit-mode-label">亮色参数</span></div>
+                <div class="studio-tabs" role="tablist" aria-label="主题分类">
+                  <button class="studio-tab" id="theme-tab-colors" type="button" role="tab" data-theme-tab="colors" aria-selected="true" aria-controls="theme-controls">Colors</button>
+                  <button class="studio-tab" id="theme-tab-typography" type="button" role="tab" data-theme-tab="typography" aria-selected="false" aria-controls="theme-controls">Typography</button>
+                  <button class="studio-tab" id="theme-tab-other" type="button" role="tab" data-theme-tab="other" aria-selected="false" aria-controls="theme-controls">Other</button>
+                </div>
+                <div class="studio-panel-body">
+                  <div class="palette-switch" aria-label="编辑的主题模式">
+                    <button type="button" data-edit-mode="light" aria-pressed="true">亮色参数</button>
+                    <button type="button" data-edit-mode="dark" aria-pressed="false">暗色参数</button>
+                  </div>
+                  <input class="control-search" id="theme-search" type="search" placeholder="搜索参数，例如 primary、圆角、字体">
+                  <div id="theme-controls" role="tabpanel" aria-labelledby="theme-tab-colors" aria-live="polite"></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="studio-pane">
+              <div class="preview-stage">
+                <div class="preview-toolbar">
+                  <div><div class="preview-title">真实看板预览</div><div class="surface-note">主题修改即时生效</div></div>
+                  <div class="preview-switch" role="tablist" aria-label="预览页面">
+                    <button type="button" role="tab" id="preview-tab-overview" data-preview-view="overview" aria-selected="true" aria-controls="preview-canvas">概览</button>
+                    <button type="button" role="tab" id="preview-tab-evidence" data-preview-view="evidence" aria-selected="false" aria-controls="preview-canvas">证据</button>
+                    <button type="button" role="tab" id="preview-tab-risk" data-preview-view="risk" aria-selected="false" aria-controls="preview-canvas">风险</button>
+                    <button type="button" role="tab" id="preview-tab-execution" data-preview-view="execution" aria-selected="false" aria-controls="preview-canvas">行动</button>
+                  </div>
+                </div>
+                <div class="preview-canvas" id="preview-canvas" role="tabpanel" aria-labelledby="preview-tab-overview" aria-live="polite"></div>
+              </div>
+            </section>
+
+            <aside class="studio-pane inspector-pane">
+              <div class="studio-panel">
+                <div class="studio-panel-head"><h2>主题状态</h2><span class="surface-note" id="theme-save-state">已保存</span></div>
+                <div class="studio-panel-body">
+                  <div class="theme-summary"><strong id="theme-name-display">冷白深青</strong><span id="theme-mode-display">当前：亮色模式</span></div>
+                  <div class="preset-list">
+                    <button class="preset-button" type="button" data-preset="cool"><span>冷白深青</span><span class="preset-dot" style="--preset-color:#0f6670"></span></button>
+                    <button class="preset-button" type="button" data-preset="graphite"><span>石墨夜</span><span class="preset-dot" style="--preset-color:#63d0c1"></span></button>
+                    <button class="preset-button" type="button" data-preset="high-contrast"><span>高对比纸白</span><span class="preset-dot" style="--preset-color:#213b43"></span></button>
+                  </div>
+                  <div class="inspector-list" style="margin-top:16px" id="inspector-list"></div>
+                  <div style="margin-top:16px">
+                    <div class="surface-note" style="margin-bottom:8px">可读性检查</div>
+                    <div class="check-list" id="contrast-checks"></div>
+                  </div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:16px">
+                    <button class="button" type="button" data-action="undo" id="undo-button">撤销</button>
+                    <button class="button" type="button" data-action="redo" id="redo-button">重做</button>
+                    <button class="button" type="button" data-action="open-import">导入 JSON</button>
+                    <button class="button" type="button" data-action="reset-theme">重置</button>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <dialog class="dialog" id="theme-dialog" aria-labelledby="dialog-title" aria-describedby="dialog-copy">
+    <div class="dialog-head"><h2 id="dialog-title">导出主题 JSON</h2><button class="button button-icon" type="button" data-action="close-dialog" aria-label="关闭">×</button></div>
+    <div class="dialog-body">
+      <p class="subtle" id="dialog-copy" style="margin:0 0 10px;font-size:11px">复制主题 JSON 可以在另一份看板中复用。不会包含报告数据。</p>
+      <textarea id="theme-json" spellcheck="false"></textarea>
+      <div class="dialog-actions">
+        <button class="button" type="button" data-action="close-dialog">取消</button>
+        <button class="button" type="button" data-action="copy-theme">复制 JSON</button>
+        <button class="button" type="button" data-action="export-download" hidden>下载 JSON</button>
+        <button class="button button-primary" type="button" data-action="apply-import" hidden>导入并应用</button>
+      </div>
+    </div>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var STORAGE_KEY = "global-ui-theme.v1";
+      var routeTitles = {
+        overview: "决策概览",
+        evidence: "证据链",
+        risk: "风险与推翻条件",
+        execution: "下一步行动",
+        theme: "Theme Studio"
+      };
+      var DEFAULT_LIGHT = {
+        colors: {
+          background: "#f5f7f8", foreground: "#182328",
+          card: "#ffffff", cardForeground: "#182328",
+          popover: "#ffffff", popoverForeground: "#182328",
+          primary: "#0f6670", primaryForeground: "#ffffff",
+          secondary: "#eef2f3", secondaryForeground: "#274148",
+          accent: "#e2f0f0", accentForeground: "#0f6670",
+          muted: "#eef2f3", mutedForeground: "#5d6a70",
+          destructive: "#a34f48", destructiveForeground: "#ffffff",
+          border: "#d8e0e3", input: "#c4d0d4", ring: "#2f7e87",
+          success: "#2f6b55", successSoft: "#e4f1eb",
+          warning: "#8a681c", warningSoft: "#fbf1d7",
+          info: "#3c6e87", infoSoft: "#e3eef4",
+          sidebar: "#edf2f3", sidebarForeground: "#182328",
+          sidebarPrimary: "#0f6670", sidebarPrimaryForeground: "#ffffff",
+          sidebarAccent: "#dfecee", sidebarAccentForeground: "#0f6670",
+          sidebarBorder: "#d8e0e3", sidebarRing: "#2f7e87"
+        },
+        typography: {
+          fontSans: "\"Segoe UI Variable\", \"Microsoft YaHei UI\", \"PingFang SC\", system-ui, sans-serif",
+          fontSerif: "\"Noto Serif SC\", \"Songti SC\", serif",
+          fontMono: "\"Cascadia Code\", \"SFMono-Regular\", Consolas, monospace",
+          baseSize: 14, lineHeight: 1.55, headingWeight: 720, letterSpacing: -0.01
+        },
+        shape: { radius: 12, controlRadius: 8, density: 1, shadowColor: "rgba(24,35,40,.13)", shadowBlur: 28, shadowY: 12 },
+        layout: { contentWidth: 1520, sidebarWidth: 232, gridOpacity: 0.12 },
+        motion: { duration: 0.18, intensity: 3 }
+      };
+      var DEFAULT_DARK = {
+        colors: {
+          background: "#101719", foreground: "#e6f0f1",
+          card: "#162124", cardForeground: "#e6f0f1",
+          popover: "#1b282b", popoverForeground: "#e6f0f1",
+          primary: "#63d0c1", primaryForeground: "#072120",
+          secondary: "#25363a", secondaryForeground: "#d5e5e6",
+          accent: "#284b4a", accentForeground: "#a9ebe2",
+          muted: "#223033", mutedForeground: "#a3b3b4",
+          destructive: "#e27d77", destructiveForeground: "#2a0f0e",
+          border: "#2a3a3d", input: "#2d4144", ring: "#77d5cb",
+          success: "#74c19c", successSoft: "#1f3a30",
+          warning: "#e2b65d", warningSoft: "#40351e",
+          info: "#8ab7d0", infoSoft: "#203643",
+          sidebar: "#0e1517", sidebarForeground: "#e6f0f1",
+          sidebarPrimary: "#63d0c1", sidebarPrimaryForeground: "#072120",
+          sidebarAccent: "#1b3536", sidebarAccentForeground: "#a9ebe2",
+          sidebarBorder: "#243438", sidebarRing: "#77d5cb"
+        },
+        typography: JSON.parse(JSON.stringify(DEFAULT_LIGHT.typography)),
+        shape: { radius: 12, controlRadius: 8, density: 1, shadowColor: "rgba(0,0,0,.38)", shadowBlur: 34, shadowY: 14 },
+        layout: { contentWidth: 1520, sidebarWidth: 232, gridOpacity: 0.18 },
+        motion: { duration: 0.18, intensity: 3 }
+      };
+      DEFAULT_LIGHT.colors.chart1 = "#0f6670";
+      DEFAULT_LIGHT.colors.chart2 = "#4d8790";
+      DEFAULT_LIGHT.colors.chart3 = "#83aab0";
+      DEFAULT_LIGHT.colors.chart4 = "#b6c9cc";
+      DEFAULT_LIGHT.colors.chart5 = "#d2dfe1";
+      DEFAULT_DARK.colors.chart1 = "#63d0c1";
+      DEFAULT_DARK.colors.chart2 = "#45a9a0";
+      DEFAULT_DARK.colors.chart3 = "#31817d";
+      DEFAULT_DARK.colors.chart4 = "#27605f";
+      DEFAULT_DARK.colors.chart5 = "#1f4445";
+
+      var theme = {
+        schemaVersion: "1.0",
+        name: "冷白深青",
+        mode: "light",
+        light: JSON.parse(JSON.stringify(DEFAULT_LIGHT)),
+        dark: JSON.parse(JSON.stringify(DEFAULT_DARK))
+      };
+      var activeTab = "colors";
+      var editMode = "light";
+      var previewView = "overview";
+      var undoStack = [];
+      var redoStack = [];
+      var captures = {};
+      var toastTimer = null;
+      var saveStatus = "主题未修改";
+
+      var colorGroups = [
+        { label: "基础层级", items: [
+          ["background", "页面背景"], ["foreground", "主文字"], ["card", "内容表面"], ["cardForeground", "表面文字"],
+          ["popover", "浮层背景"], ["popoverForeground", "浮层文字"], ["muted", "弱背景"], ["mutedForeground", "弱文字"]
+        ]},
+        { label: "交互角色", items: [
+          ["primary", "主色"], ["primaryForeground", "主色文字"], ["secondary", "次要色"], ["secondaryForeground", "次要文字"],
+          ["accent", "强调背景"], ["accentForeground", "强调文字"], ["destructive", "危险色"], ["destructiveForeground", "危险文字"]
+        ]},
+        { label: "边界与焦点", items: [
+          ["border", "边框"], ["input", "输入框边框"], ["ring", "焦点环"], ["success", "成功状态"],
+          ["successSoft", "成功背景"], ["warning", "警告状态"], ["warningSoft", "警告背景"], ["info", "信息状态"], ["infoSoft", "信息背景"]
+        ]},
+        { label: "图表色板", items: [
+          ["chart1", "Chart 1"], ["chart2", "Chart 2"], ["chart3", "Chart 3"], ["chart4", "Chart 4"], ["chart5", "Chart 5"]
+        ]},
+        { label: "Sidebar", items: [
+          ["sidebar", "Sidebar 背景"], ["sidebarForeground", "Sidebar 文字"], ["sidebarPrimary", "Sidebar 主色"],
+          ["sidebarPrimaryForeground", "Sidebar 主色文字"], ["sidebarAccent", "Sidebar 强调背景"], ["sidebarAccentForeground", "Sidebar 强调文字"],
+          ["sidebarBorder", "Sidebar 边框"], ["sidebarRing", "Sidebar 焦点环"]
+        ]}
+      ];
+      var numericLimits = {
+        baseSize: [12, 18], lineHeight: [1.35, 1.8], headingWeight: [600, 800], letterSpacing: [-0.04, 0.08],
+        radius: [0, 24], controlRadius: [0, 16], density: [0.82, 1.22], shadowBlur: [0, 60], shadowY: [0, 24],
+        contentWidth: [1080, 1800], sidebarWidth: [180, 300], gridOpacity: [0, 0.4], intensity: [0, 6], duration: [0.08, 0.5]
+      };
+
+      function clone(value) { return JSON.parse(JSON.stringify(value)); }
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, function (char) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#039;" }[char];
+        });
+      }
+      function getPath(object, path) {
+        return path.split(".").reduce(function (current, key) { return current == null ? undefined : current[key]; }, object);
+      }
+      function setPath(object, path, value) {
+        var parts = path.split(".");
+        var target = object;
+        for (var i = 0; i < parts.length - 1; i += 1) {
+          if (!target[parts[i]] || typeof target[parts[i]] !== "object") target[parts[i]] = {};
+          target = target[parts[i]];
+        }
+        target[parts[parts.length - 1]] = value;
+      }
+      function isSafeKey(key) {
+        return key !== "__proto__" && key !== "constructor" && key !== "prototype";
+      }
+      function mergeInto(target, source) {
+        if (!source || typeof source !== "object") return target;
+        Object.keys(source).forEach(function (key) {
+          if (!isSafeKey(key)) return;
+          if (source[key] && typeof source[key] === "object" && !Array.isArray(source[key])) {
+            if (!target[key] || typeof target[key] !== "object") target[key] = {};
+            mergeInto(target[key], source[key]);
+          } else if (source[key] !== undefined) {
+            target[key] = source[key];
+          }
+        });
+        return target;
+      }
+      function isRecord(value) {
+        return value !== null && typeof value === "object" && !Array.isArray(value);
+      }
+      function normalizeGroup(rawGroup, fallbackGroup, groupName) {
+        var group = clone(fallbackGroup);
+        if (!isRecord(rawGroup)) return group;
+        mergeInto(group, rawGroup);
+        Object.keys(fallbackGroup).forEach(function (key) {
+          var fallbackValue = fallbackGroup[key];
+          var value = group[key];
+          var valid = typeof value === typeof fallbackValue && value !== null && value !== undefined;
+          if (typeof fallbackValue === "string") valid = valid && value.trim() !== "";
+          if (typeof fallbackValue === "number") valid = valid && Number.isFinite(value);
+          if (valid && typeof fallbackValue === "number" && numericLimits[key]) {
+            value = Math.min(numericLimits[key][1], Math.max(numericLimits[key][0], value));
+          }
+          if (valid && typeof fallbackValue === "string" && (groupName === "colors" || (groupName === "shape" && key === "shadowColor"))) {
+            valid = supportsColor(value);
+          }
+          if (!valid) group[key] = fallbackValue;
+          else group[key] = value;
+        });
+        return group;
+      }
+      function normalizeModeTheme(rawMode, fallbackMode) {
+        if (!isRecord(rawMode)) return clone(fallbackMode);
+        var mode = clone(fallbackMode);
+        ["colors", "typography", "shape", "layout", "motion"].forEach(function (groupName) {
+          mode[groupName] = normalizeGroup(rawMode[groupName], fallbackMode[groupName], groupName);
+        });
+        return mode;
+      }
+      function isThemePayload(raw) {
+        if (!isRecord(raw)) return false;
+        if (raw.schemaVersion && raw.schemaVersion !== "1.0") return false;
+        if (!isRecord(raw.light) || !isRecord(raw.dark)) return false;
+        return ["colors", "typography", "shape", "layout", "motion"].every(function (groupName) {
+          return isRecord(raw.light[groupName]) && isRecord(raw.dark[groupName]);
+        });
+      }
+      function normalizeTheme(raw) {
+        var base = {
+          schemaVersion: "1.0",
+          name: "冷白深青",
+          mode: "light",
+          light: clone(DEFAULT_LIGHT),
+          dark: clone(DEFAULT_DARK)
+        };
+        if (!isRecord(raw)) return base;
+        if (raw.schemaVersion && raw.schemaVersion !== "1.0") return base;
+        base.name = typeof raw.name === "string" && raw.name.trim() ? raw.name.trim() : base.name;
+        base.mode = ["light", "dark", "auto"].indexOf(raw.mode) !== -1 ? raw.mode : base.mode;
+        base.light = normalizeModeTheme(raw.light, DEFAULT_LIGHT);
+        base.dark = normalizeModeTheme(raw.dark, DEFAULT_DARK);
+        return base;
+      }
+      function readStoredTheme() {
+        try {
+          var raw = window.localStorage.getItem(STORAGE_KEY);
+          if (!raw) return null;
+          var parsed = JSON.parse(raw);
+          if (!isThemePayload(parsed)) return null;
+          var normalized = normalizeTheme(parsed);
+          try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized)); } catch (storageError) {}
+          return normalized;
+        } catch (error) {
+          return null;
+        }
+      }
+      function saveTheme(message) {
+        try {
+          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(theme));
+          saveStatus = message || "已自动保存";
+        } catch (error) {
+          saveStatus = "本地存储不可用，可使用 JSON 导出";
+        }
+        updateStatus();
+      }
+      function effectiveMode() {
+        if (theme.mode !== "auto") return theme.mode;
+        return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      function applyTheme() {
+        var active = theme[effectiveMode()];
+        var colors = active.colors;
+        var typography = active.typography;
+        var shape = active.shape;
+        var layout = active.layout;
+        var motion = active.motion;
+        var root = document.documentElement;
+        var map = {
+          "--background": colors.background, "--foreground": colors.foreground,
+          "--card": colors.card, "--card-foreground": colors.cardForeground,
+          "--popover": colors.popover, "--popover-foreground": colors.popoverForeground,
+          "--primary": colors.primary, "--primary-foreground": colors.primaryForeground,
+          "--secondary": colors.secondary, "--secondary-foreground": colors.secondaryForeground,
+          "--accent": colors.accent, "--accent-foreground": colors.accentForeground,
+          "--muted": colors.muted, "--muted-foreground": colors.mutedForeground,
+          "--destructive": colors.destructive, "--destructive-foreground": colors.destructiveForeground,
+          "--border": colors.border, "--input": colors.input, "--ring": colors.ring,
+          "--success": colors.success, "--success-soft": colors.successSoft,
+          "--warning": colors.warning, "--warning-soft": colors.warningSoft,
+          "--info": colors.info, "--info-soft": colors.infoSoft,
+          "--chart-1": colors.chart1, "--chart-2": colors.chart2, "--chart-3": colors.chart3, "--chart-4": colors.chart4, "--chart-5": colors.chart5,
+          "--sidebar": colors.sidebar, "--sidebar-foreground": colors.sidebarForeground,
+          "--sidebar-primary": colors.sidebarPrimary, "--sidebar-primary-foreground": colors.sidebarPrimaryForeground,
+          "--sidebar-accent": colors.sidebarAccent, "--sidebar-accent-foreground": colors.sidebarAccentForeground,
+          "--sidebar-border": colors.sidebarBorder, "--sidebar-ring": colors.sidebarRing,
+          "--font-sans": typography.fontSans, "--font-serif": typography.fontSerif, "--font-mono": typography.fontMono,
+          "--base-size": typography.baseSize + "px", "--line-height": typography.lineHeight,
+          "--heading-weight": typography.headingWeight, "--letter-spacing": typography.letterSpacing + "em",
+          "--radius": shape.radius + "px", "--control-radius": shape.controlRadius + "px",
+          "--density": shape.density, "--content-width": layout.contentWidth + "px", "--sidebar-width": layout.sidebarWidth + "px",
+          "--shadow-color": shape.shadowColor, "--shadow-blur": shape.shadowBlur + "px", "--shadow-y": shape.shadowY + "px",
+          "--grid-opacity": layout.gridOpacity, "--motion-duration": motion.intensity === 0 ? ".01s" : motion.duration + "s",
+          "--page-pad": "calc(28px * " + shape.density + ")"
+        };
+        Object.keys(map).forEach(function (key) { root.style.setProperty(key, map[key]); });
+        root.setAttribute("data-mode", effectiveMode());
+        root.setAttribute("data-motion", motion.intensity === 0 ? "none" : "normal");
+        updateStatus();
+      }
+      function pushHistory(before) {
+        undoStack.push(before);
+        if (undoStack.length > 50) undoStack.shift();
+        redoStack = [];
+      }
+      function beginCapture(path) {
+        if (!captures[path]) captures[path] = clone(theme);
+      }
+      function finishCapture(path, label) {
+        if (!captures[path]) return;
+        var before = captures[path];
+        delete captures[path];
+        if (JSON.stringify(before) !== JSON.stringify(theme)) {
+          pushHistory(before);
+          saveTheme(label || "已自动保存");
+        }
+      }
+      function changePath(path, value, label, liveOnly) {
+        var before = clone(theme);
+        setPath(theme, path, value);
+        applyTheme();
+        updateThemeUI();
+        if (!liveOnly) {
+          pushHistory(before);
+          saveTheme(label || "已自动保存");
+        }
+      }
+      function commitWhole(nextTheme, label) {
+        var before = clone(theme);
+        theme = normalizeTheme(nextTheme);
+        pushHistory(before);
+        applyTheme();
+        renderThemeControls();
+        updateThemeUI();
+        saveTheme(label || "已自动保存");
+      }
+      function undo() {
+        if (!undoStack.length) return;
+        redoStack.push(clone(theme));
+        theme = normalizeTheme(undoStack.pop());
+        applyTheme();
+        renderThemeControls();
+        updateThemeUI();
+        saveTheme("已撤销");
+      }
+      function redo() {
+        if (!redoStack.length) return;
+        undoStack.push(clone(theme));
+        theme = normalizeTheme(redoStack.pop());
+        applyTheme();
+        renderThemeControls();
+        updateThemeUI();
+        saveTheme("已重做");
+      }
+      function colorInputValue(value) {
+        var match = String(value || "").trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+        if (!match) return "#000000";
+        return match[1].length === 3 ? "#" + match[1].split("").map(function (char) { return char + char; }).join("") : String(value).toLowerCase();
+      }
+      function supportsColor(value) {
+        return window.CSS && CSS.supports ? CSS.supports("color", String(value)) : true;
+      }
+      function renderColorControls(search) {
+        var active = theme[editMode];
+        var html = "";
+        colorGroups.forEach(function (group) {
+          var items = group.items.filter(function (item) {
+            var query = String(search || "").toLowerCase();
+            return !query || (item[0] + " " + item[1]).toLowerCase().indexOf(query) !== -1;
+          });
+          if (!items.length) return;
+          html += "<div class=\"control-group\"><h3>" + group.label + "</h3>";
+          items.forEach(function (item) {
+            var path = editMode + ".colors." + item[0];
+            var value = getPath(theme, path);
+            html += "<div class=\"color-control\" data-control-search=\"" + escapeHtml(item[0] + " " + item[1]) + "\"><label><span class=\"token-label\">" + item[1] + "</span><span class=\"token-key\">" + item[0] + "</span><input class=\"control-text token-color-text\" data-path=\"" + path + "\" value=\"" + escapeHtml(value) + "\" aria-label=\"" + item[1] + " CSS 值\"></label><input class=\"color-input token-color-picker\" type=\"color\" data-path=\"" + path + "\" value=\"" + colorInputValue(value) + "\" aria-label=\"" + item[1] + " 颜色选择器\"></div>";
+          });
+          html += "</div>";
+        });
+        return html || "<div class=\"control-help\">没有匹配的主题参数。</div>";
+      }
+      function renderTypographyControls(search) {
+        var modePath = editMode + ".typography.";
+        var fields = [
+          ["fontSans", "Sans 字体", "text", "例如：Segoe UI Variable, Microsoft YaHei UI, system-ui, sans-serif"],
+          ["fontSerif", "Serif 字体", "text", "例如：Noto Serif SC, Songti SC, serif"],
+          ["fontMono", "Mono 字体", "text", "例如：Cascadia Code, Consolas, monospace"],
+          ["baseSize", "基础字号", "range", 12, 18],
+          ["lineHeight", "正文行高", "range", 1.35, 1.8],
+          ["headingWeight", "标题字重", "range", 600, 800],
+          ["letterSpacing", "字距", "range", -0.04, 0.08]
+        ];
+        var html = "<div class=\"control-group\"><h3>字体与排版</h3>";
+        fields.forEach(function (field) {
+          var path = modePath + field[0];
+          var value = getPath(theme, path);
+          var query = String(search || "").toLowerCase();
+          if (query && (field[0] + " " + field[1]).toLowerCase().indexOf(query) === -1) return;
+          if (field[2] === "text") {
+            html += "<label><span class=\"token-label\">" + field[1] + "</span><span class=\"token-key\">" + field[0] + "</span><input class=\"control-text\" data-path=\"" + path + "\" data-value-type=\"string\" value=\"" + escapeHtml(value) + "\" aria-label=\"" + field[1] + "\"><span class=\"control-help\">" + field[3] + "</span></label>";
+          } else {
+            var min = field[3];
+            var max = field[4];
+            var step = field[0] === "lineHeight" || field[0] === "letterSpacing" ? "0.01" : "1";
+            html += "<label><span class=\"token-label\">" + field[1] + "</span><span class=\"token-key\">" + field[0] + "</span><div class=\"range-control\"><input type=\"range\" min=\"" + min + "\" max=\"" + max + "\" step=\"" + step + "\" value=\"" + value + "\" data-path=\"" + path + "\" data-value-type=\"number\"><span class=\"range-value\" data-range-output=\"" + path + "\">" + formatRangeValue(path, value) + "</span></div></label>";
+          }
+        });
+        return html + "</div>";
+      }
+      function renderOtherControls(search) {
+        var fields = [
+          ["shape.radius", "圆角", 0, 24, 1, "px"],
+          ["shape.controlRadius", "控件圆角", 0, 16, 1, "px"],
+          ["shape.density", "内容密度", 0.82, 1.22, 0.01, "x"],
+          ["shape.shadowBlur", "阴影模糊", 0, 60, 1, "px"],
+          ["shape.shadowY", "阴影下移", 0, 24, 1, "px"],
+          ["layout.contentWidth", "内容最大宽度", 1080, 1800, 10, "px"],
+          ["layout.sidebarWidth", "侧栏宽度", 180, 300, 2, "px"],
+          ["layout.gridOpacity", "图表网格强度", 0, 0.4, 0.01, ""],
+          ["motion.intensity", "动效强度", 0, 6, 1, " / 6"],
+          ["motion.duration", "动效时长", 0.08, 0.5, 0.01, "s"]
+        ];
+        var html = "<div class=\"control-group\"><h3>形态、布局与动效</h3>";
+        fields.forEach(function (field) {
+          var query = String(search || "").toLowerCase();
+          if (query && (field[0] + " " + field[1]).toLowerCase().indexOf(query) === -1) return;
+          var path = editMode + "." + field[0];
+          var value = getPath(theme, path);
+          html += "<label><span class=\"token-label\">" + field[1] + "</span><span class=\"token-key\">" + field[0] + "</span><div class=\"range-control\"><input type=\"range\" min=\"" + field[2] + "\" max=\"" + field[3] + "\" step=\"" + field[4] + "\" value=\"" + value + "\" data-path=\"" + path + "\" data-value-type=\"number\"><span class=\"range-value\" data-range-output=\"" + path + "\">" + formatRangeValue(path, value) + "</span></div></label>";
+        });
+        html += "</div><div class=\"control-group\"><h3>阴影颜色</h3><label><span class=\"token-label\">阴影颜色</span><span class=\"token-key\">shape.shadowColor</span><input class=\"control-text\" data-path=\"" + editMode + ".shape.shadowColor\" data-value-type=\"string\" value=\"" + escapeHtml(getPath(theme, editMode + ".shape.shadowColor")) + "\"></label><p class=\"control-help\">支持 rgba()、hex 或其他浏览器支持的 CSS 颜色值。</p></div>";
+        return html;
+      }
+      function formatRangeValue(path, value) {
+        var key = String(path || "").toLowerCase();
+        if (key.indexOf("radius") !== -1 || key.indexOf("width") !== -1 || key.indexOf("shadow") !== -1) return value + "px";
+        if (key.indexOf("density") !== -1) return value + "x";
+        if (key.indexOf("duration") !== -1) return value + "s";
+        if (key.indexOf("intensity") !== -1) return value + " / 6";
+        if (key.indexOf("letterspacing") !== -1) return value + "em";
+        return value;
+      }
+      function renderThemeControls() {
+        var search = document.getElementById("theme-search").value;
+        var target = document.getElementById("theme-controls");
+        if (activeTab === "colors") target.innerHTML = renderColorControls(search);
+        if (activeTab === "typography") target.innerHTML = renderTypographyControls(search);
+        if (activeTab === "other") target.innerHTML = renderOtherControls(search);
+        bindControlInputs();
+        document.getElementById("edit-mode-label").textContent = editMode === "light" ? "亮色参数" : "暗色参数";
+        document.getElementById("theme-controls").setAttribute("aria-labelledby", "theme-tab-" + activeTab);
+      }
+      function bindControlInputs() {
+        var controls = document.querySelectorAll("#theme-controls [data-path]");
+        controls.forEach(function (control) {
+          var path = control.getAttribute("data-path");
+          control.addEventListener("focus", function () { beginCapture(path); });
+          control.addEventListener("pointerdown", function () { beginCapture(path); });
+          control.addEventListener("input", function (event) {
+            var value = event.currentTarget.value;
+            var type = event.currentTarget.getAttribute("data-value-type");
+            if (type === "number") value = Number(value);
+            if (event.currentTarget.classList.contains("token-color-picker")) {
+              var text = document.querySelector(".token-color-text[data-path=\"" + path + "\"]");
+              if (text) text.value = value;
+            }
+            if (event.currentTarget.classList.contains("token-color-text")) {
+              var picker = document.querySelector(".token-color-picker[data-path=\"" + path + "\"]");
+              if (picker && /^#[0-9a-f]{6}$/i.test(value)) picker.value = value;
+            }
+            if (typeof value === "string" && (!value.trim() || !supportsColor(value)) && path.indexOf(".colors.") !== -1) {
+              event.currentTarget.setAttribute("aria-invalid", "true");
+              return;
+            }
+            event.currentTarget.removeAttribute("aria-invalid");
+            setPath(theme, path, value);
+            applyTheme();
+            updateThemeUI();
+            saveTheme("已自动保存");
+            var output = document.querySelector("[data-range-output=\"" + path + "\"]");
+            if (output) output.textContent = formatRangeValue(path, value);
+          });
+          control.addEventListener("change", function () { finishCapture(path, "已自动保存"); });
+          control.addEventListener("blur", function () { finishCapture(path, "已自动保存"); });
+        });
+      }
+      function updateStatus() {
+        document.getElementById("autosave-status").textContent = saveStatus;
+        document.getElementById("theme-save-state").textContent = saveStatus.indexOf("不可用") !== -1 ? "需导出" : "已保存";
+        document.getElementById("theme-name-display").textContent = theme.name;
+        document.getElementById("theme-mode-display").textContent = "当前：" + (effectiveMode() === "dark" ? "暗色模式" : "亮色模式") + " · " + (theme.mode === "auto" ? "跟随系统" : "手动");
+        document.getElementById("theme-updated-meta").textContent = saveStatus;
+        document.getElementById("undo-button").disabled = !undoStack.length;
+        document.getElementById("redo-button").disabled = !redoStack.length;
+        document.querySelectorAll("[data-mode-choice]").forEach(function (button) {
+          button.setAttribute("aria-pressed", String(button.getAttribute("data-mode-choice") === theme.mode));
+        });
+      }
+      function updateThemeUI() {
+        updateStatus();
+        renderInspector();
+        if (location.hash.replace("#/", "") === "theme") renderPreview(previewView);
+      }
+      function renderInspector() {
+        var active = theme[effectiveMode()];
+        var c = active.colors;
+        var rows = [
+          ["Background", c.background], ["Foreground", c.foreground], ["Primary", c.primary],
+          ["Card", c.card], ["Border", c.border], ["Radius", active.shape.radius + "px"],
+          ["Density", active.shape.density + "x"], ["Storage", "localStorage"]
+        ];
+        document.getElementById("inspector-list").innerHTML = rows.map(function (row) {
+          return "<div class=\"inspector-row\"><span class=\"inspector-name\">" + row[0] + "</span><span class=\"inspector-value\">" + escapeHtml(row[1]) + "</span></div>";
+        }).join("");
+        var checks = [
+          { label: "主文字 / 页面背景", pass: contrastRatio(c.foreground, c.background) >= 4.5 },
+          { label: "主色文字 / 主色背景", pass: contrastRatio(c.primaryForeground, c.primary) >= 4.5 },
+          { label: "次要文字 / 页面背景", pass: contrastRatio(c.mutedForeground, c.background) >= 3 },
+          { label: "危险文字 / 危险背景", pass: contrastRatio(c.destructiveForeground, c.destructive) >= 4.5 }
+        ];
+        document.getElementById("contrast-checks").innerHTML = checks.map(function (item) {
+          return "<div class=\"check-item " + (item.pass ? "" : "warning") + "\"><span class=\"check-mark\">" + (item.pass ? "✓" : "!") + "</span><span>" + item.label + "：" + (item.pass ? "通过" : "需要调整") + "</span></div>";
+        }).join("");
+      }
+      function hexToRgb(value) {
+        var hex = String(value || "").replace("#", "");
+        if (hex.length === 3) hex = hex.split("").map(function (char) { return char + char; }).join("");
+        if (!/^[0-9a-f]{6}$/i.test(hex)) return null;
+        return [parseInt(hex.slice(0, 2), 16) / 255, parseInt(hex.slice(2, 4), 16) / 255, parseInt(hex.slice(4, 6), 16) / 255];
+      }
+      var colorProbe = null;
+      function cssColorToRgb(value) {
+        var hex = hexToRgb(value);
+        if (hex) return hex;
+        if (!colorProbe) {
+          var canvas = document.createElement("canvas");
+          colorProbe = canvas.getContext("2d");
+        }
+        if (!colorProbe || typeof value !== "string") return null;
+        colorProbe.fillStyle = "#000000";
+        colorProbe.fillStyle = value;
+        var normalized = colorProbe.fillStyle;
+        var match = String(normalized).match(/^rgba?\(\s*([0-9.]+)[, ]+\s*([0-9.]+)[, ]+\s*([0-9.]+)/i);
+        if (!match) return null;
+        return [Number(match[1]) / 255, Number(match[2]) / 255, Number(match[3]) / 255];
+      }
+      function luminance(value) {
+        var rgb = cssColorToRgb(value);
+        if (!rgb) return 0.5;
+        return rgb.map(function (channel) { return channel <= .03928 ? channel / 12.92 : Math.pow((channel + .055) / 1.055, 2.4); }).reduce(function (sum, channel, index) { return sum + channel * [0.2126, 0.7152, 0.0722][index]; }, 0);
+      }
+      function contrastRatio(first, second) {
+        var a = luminance(first);
+        var b = luminance(second);
+        var high = Math.max(a, b);
+        var low = Math.min(a, b);
+        return (high + .05) / (low + .05);
+      }
+      function presetTheme(kind) {
+        var next = normalizeTheme(theme);
+        if (kind === "cool") {
+          next = normalizeTheme({ schemaVersion: "1.0", name: "冷白深青", mode: "light", light: DEFAULT_LIGHT, dark: DEFAULT_DARK });
+        }
+        if (kind === "graphite") {
+          next = normalizeTheme({ schemaVersion: "1.0", name: "石墨夜", mode: "dark", light: DEFAULT_LIGHT, dark: DEFAULT_DARK });
+          next.dark.colors.primary = "#8ee4d8";
+          next.dark.colors.primaryForeground = "#092624";
+          next.dark.colors.accent = "#254d4a";
+          next.dark.colors.accentForeground = "#b4f4ea";
+        }
+        if (kind === "high-contrast") {
+          next = normalizeTheme({ schemaVersion: "1.0", name: "高对比纸白", mode: "light", light: DEFAULT_LIGHT, dark: DEFAULT_DARK });
+          next.light.colors.background = "#f7f8f7";
+          next.light.colors.foreground = "#142024";
+          next.light.colors.border = "#aebdc1";
+          next.light.colors.mutedForeground = "#44545a";
+          next.light.colors.primary = "#213b43";
+          next.light.colors.accent = "#dcebed";
+          next.light.shape.radius = 8;
+        }
+        return next;
+      }
+      function renderPreview(view) {
+        var canvas = document.getElementById("preview-canvas");
+        var html = "";
+        if (view === "overview") {
+          html = "<article class=\"decision-hero\"><div class=\"decision-copy\"><div><div class=\"eyebrow\">RECOMMENDED DECISION</div><h2>小范围验证后扩展</h2><p>把高影响、可验证和可回滚的条件放在同一条决策链里。</p></div><div class=\"decision-action\"><div><strong>启动 48 小时验证窗口</strong><span>失败时回滚到备选方案。</span></div><button class=\"sample-button primary\" type=\"button\">开始验证</button></div></div><div class=\"decision-side\"><div><div class=\"score-label\">推荐方案得分</div><div class=\"score\">87<small>/100</small></div><div class=\"score-caption\">领先第二名 15 分，当前建议较稳定。</div></div><div class=\"score-facts\"><div class=\"score-fact\"><span>证据覆盖</span><strong>7/9</strong></div><div class=\"score-fact\"><span>可回滚性</span><strong>94</strong></div></div></div></article><div class=\"signal-row\"><div class=\"signal\"><div class=\"signal-label\">置信度</div><div class=\"signal-value\">86</div><div class=\"signal-copy\">较上次 +8</div></div><div class=\"signal\"><div class=\"signal-label\">证据覆盖</div><div class=\"signal-value\">7/9</div><div class=\"signal-copy\">两项缺口</div></div><div class=\"signal\"><div class=\"signal-label\">可回滚性</div><div class=\"signal-value\">94</div><div class=\"signal-copy\">路径已记录</div></div></div><div class=\"section-grid\"><article class=\"surface\"><div class=\"surface-head\"><h2>证据链</h2><span class=\"surface-note\">3 条主张</span></div><div class=\"surface-body evidence-chain\"><div class=\"evidence-item\"><div class=\"evidence-kind\">主张</div><div><div class=\"evidence-title\">验证可以降低失败成本</div><div class=\"evidence-copy\">先取得真实反馈，再扩大范围。</div></div></div><div class=\"evidence-item\"><div class=\"evidence-kind\">限制</div><div><div class=\"evidence-title\">证据覆盖仍不完整</div><div class=\"evidence-copy\">不能把评分理解成确定性结论。</div></div></div></div></article><article class=\"surface\"><div class=\"surface-head\"><h2>风险与行动</h2><span class=\"surface-note\">当前优先级</span></div><div class=\"surface-body action-list\"><div class=\"action-row\"><div class=\"action-index\">01</div><div><div class=\"action-title\">确认视觉方向</div><div class=\"action-meta\">今天</div></div><span class=\"status status-info\">复核</span></div><div class=\"action-row\"><div class=\"action-index\">02</div><div><div class=\"action-title\">补齐来源检查</div><div class=\"action-meta\">发布前</div></div><span class=\"status status-warning\">待处理</span></div></div></article></div><div class=\"component-lab\"><div class=\"component-sample\"><h3>按钮与状态</h3><div class=\"sample-buttons\"><button class=\"sample-button primary\" type=\"button\">主操作</button><button class=\"sample-button\" type=\"button\">次要操作</button><button class=\"sample-button danger\" type=\"button\">危险操作</button></div></div><div class=\"component-sample\"><h3>输入与浮层</h3><input class=\"sample-input\" value=\"主题参数实时预览\" aria-label=\"主题预览输入框\"></div></div>";
+        }
+        if (view === "evidence") {
+          html = "<article class=\"surface\"><div class=\"surface-head\"><h2>证据表格</h2><span class=\"surface-note\">真实组件预览</span></div><div class=\"metric-inline\"><div class=\"metric-inline-item\"><div class=\"metric-inline-label\">覆盖</div><div class=\"metric-inline-value\">7/9</div></div><div class=\"metric-inline-item\"><div class=\"metric-inline-label\">质量</div><div class=\"metric-inline-value\">3</div></div><div class=\"metric-inline-item\"><div class=\"metric-inline-label\">冲突</div><div class=\"metric-inline-value\">1</div></div><div class=\"metric-inline-item\"><div class=\"metric-inline-label\">过期</div><div class=\"metric-inline-value\">0</div></div></div><div class=\"table-wrap\"><table class=\"data-table\"><thead><tr><th>主张</th><th>来源</th><th>质量</th><th>限制</th></tr></thead><tbody><tr><td class=\"title\">只读边界可以由模板层约束</td><td>静态扫描</td><td><span class=\"status status-success\">高</span></td><td class=\"note\">上游脚本仍需遵守规则。</td></tr><tr><td class=\"title\">主题需要真实组件预览</td><td>TweakCN 参考</td><td><span class=\"status status-info\">中</span></td><td class=\"note\">新看板覆盖表格、图表和表单。</td></tr></tbody></table></div></article><div class=\"component-lab\"><div class=\"component-sample\"><h3>空状态</h3><p class=\"subtle\" style=\"font-size:9px;margin:0\">还没有新的证据记录。</p></div><div class=\"component-sample\"><h3>筛选输入</h3><input class=\"sample-input\" placeholder=\"搜索证据\" aria-label=\"证据搜索\"></div></div>";
+        }
+        if (view === "risk") {
+          html = "<div class=\"risk-action-grid\"><article class=\"surface risk-callout\"><div class=\"eyebrow\" style=\"color:var(--destructive)\">HIGHEST RISK</div><h3>证据不足导致过度确定</h3><p>如果置信度降到 70 以下，应暂停当前推荐。</p><span class=\"risk-trigger\">推翻条件：置信度 &lt; 70</span></article><article class=\"surface\"><div class=\"surface-head\"><h2>风险状态</h2><span class=\"surface-note\">三项样本</span></div><div class=\"surface-body action-list\"><div class=\"action-row\"><div class=\"action-index\">01</div><div><div class=\"action-title\">上游数据结构不统一</div><div class=\"action-meta\">残余暴露 2</div></div><span class=\"status status-warning\">观察</span></div><div class=\"action-row\"><div class=\"action-index\">02</div><div><div class=\"action-title\">证据不足</div><div class=\"action-meta\">残余暴露 2</div></div><span class=\"status status-danger\">高风险</span></div></div></article></div><article class=\"surface\" style=\"margin-top:14px\"><div class=\"surface-head\"><h2>风险登记表</h2><span class=\"surface-note\">表格预览</span></div><div class=\"table-wrap\"><table class=\"data-table\"><thead><tr><th>风险</th><th>概率</th><th>残余</th><th>触发条件</th></tr></thead><tbody><tr><td class=\"title\">上游数据结构不统一</td><td>中</td><td class=\"mono\">2/9</td><td class=\"note\">字段缺失</td></tr><tr><td class=\"title\">证据不足导致过度确定</td><td>低</td><td class=\"mono\">2/9</td><td class=\"note\">置信度低于 70</td></tr></tbody></table></div></article>";
+        }
+        if (view === "execution") {
+          html = "<article class=\"surface\"><div class=\"surface-head\"><h2>行动队列</h2><span class=\"surface-note\">下一步行动预览</span></div><div class=\"surface-body action-list\"><div class=\"action-row\"><div class=\"action-index\">01</div><div><div class=\"action-title\">确认最终视觉方向</div><div class=\"action-meta\">创建人 · 今天 · 成功标准已定义</div></div><span class=\"status status-info\">复核</span></div><div class=\"action-row\"><div class=\"action-index\">02</div><div><div class=\"action-title\">适配结构化输出</div><div class=\"action-meta\">工作流 · 下一次运行 · 通过样本渲染</div></div><span class=\"status status-success\">计划中</span></div><div class=\"action-row\"><div class=\"action-index\">03</div><div><div class=\"action-title\">检查来源完整性</div><div class=\"action-meta\">系统 · 发布前 · 权限和时间齐全</div></div><span class=\"status status-warning\">待处理</span></div></div></article><div class=\"component-lab\"><div class=\"component-sample\"><h3>进度与反馈</h3><div class=\"chart\" style=\"height:100px;padding-top:8px\"><div class=\"chart-column\"><div class=\"chart-value\">2</div><div class=\"chart-bar\" style=\"--bar-height:32%\"></div><div class=\"chart-label\">待处理</div></div><div class=\"chart-column\"><div class=\"chart-value\">1</div><div class=\"chart-bar\" style=\"--bar-height:58%\"></div><div class=\"chart-label\">复核</div></div><div class=\"chart-column\"><div class=\"chart-value\">2</div><div class=\"chart-bar\" style=\"--bar-height:82%\"></div><div class=\"chart-label\">计划中</div></div></div></div><div class=\"component-sample\"><h3>弹窗与危险操作</h3><div class=\"sample-buttons\"><button class=\"sample-button\" type=\"button\">查看详情</button><button class=\"sample-button danger\" type=\"button\">回滚</button></div></div></div>";
+        }
+        canvas.innerHTML = html;
+        document.querySelectorAll("[data-preview-view]").forEach(function (button) {
+          button.setAttribute("aria-selected", String(button.getAttribute("data-preview-view") === previewView));
+        });
+        canvas.setAttribute("aria-labelledby", "preview-tab-" + previewView);
+      }
+      function setRoute(route) {
+        if (!routeTitles[route]) route = "overview";
+        document.querySelectorAll(".view").forEach(function (view) { view.classList.toggle("is-active", view.id === "view-" + route); });
+        document.querySelectorAll("[data-route-link]").forEach(function (link) {
+          link.setAttribute("aria-current", link.getAttribute("data-route-link") === route ? "page" : "false");
+        });
+        document.getElementById("route-label").textContent = route.toUpperCase();
+        document.getElementById("topbar-title").textContent = routeTitles[route];
+        if (route === "theme") {
+          renderThemeControls();
+          renderPreview(previewView);
+          updateThemeUI();
+        }
+        document.body.classList.remove("nav-open");
+      }
+      function updateMode(mode) {
+        var before = clone(theme);
+        theme.mode = mode;
+        pushHistory(before);
+        applyTheme();
+        updateThemeUI();
+        saveTheme("主题模式已保存");
+      }
+      function showToast(message) {
+        var toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.classList.add("is-visible");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.classList.remove("is-visible"); }, 2400);
+      }
+      function openDialog(importMode) {
+        var dialog = document.getElementById("theme-dialog");
+        var textarea = document.getElementById("theme-json");
+        document.getElementById("dialog-title").textContent = importMode ? "导入主题 JSON" : "导出主题 JSON";
+        document.getElementById("dialog-copy").textContent = importMode ? "粘贴由本看板或其他主题编辑器导出的 JSON。不会导入报告数据。" : "复制主题 JSON 可以在另一份看板中复用。不会包含报告数据。";
+        document.querySelector("[data-action=\"copy-theme\"]").hidden = importMode;
+        document.querySelector("[data-action=\"export-download\"]").hidden = importMode;
+        document.querySelector("[data-action=\"apply-import\"]").hidden = !importMode;
+        textarea.value = importMode ? "" : JSON.stringify(theme, null, 2);
+        dialog.showModal();
+        if (!importMode) textarea.select();
+      }
+      function exportTheme() {
+        var payload = JSON.stringify(theme, null, 2);
+        var blob = new Blob([payload], { type: "application/json;charset=utf-8" });
+        var url = URL.createObjectURL(blob);
+        var link = document.createElement("a");
+        link.href = url;
+        link.download = "decision-studio-theme.json";
+        link.click();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+        showToast("主题 JSON 已导出");
+      }
+      function copyTheme() {
+        var payload = document.getElementById("theme-json").value;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(payload).then(function () { showToast("主题 JSON 已复制"); }, function () { showToast("请手动复制文本"); });
+        } else {
+          showToast("请手动复制文本");
+        }
+      }
+      function importTheme() {
+        var raw = document.getElementById("theme-json").value;
+        try {
+          var parsed = JSON.parse(raw);
+          if (!isThemePayload(parsed)) throw new Error("shape");
+          var next = normalizeTheme(parsed);
+          document.getElementById("theme-dialog").close();
+          commitWhole(next, "主题已导入并保存");
+          showToast("主题已导入");
+        } catch (error) {
+          showToast("JSON 无法识别，请检查格式");
+        }
+      }
+
+      theme = readStoredTheme() || theme;
+      document.querySelectorAll("[data-route-link]").forEach(function (link) {
+        link.addEventListener("click", function () {
+          var route = link.getAttribute("data-route-link");
+          if (location.hash !== "#/" + route) location.hash = "#/" + route;
+        });
+      });
+      document.querySelectorAll("[data-mode-choice]").forEach(function (button) {
+        button.addEventListener("click", function () { updateMode(button.getAttribute("data-mode-choice")); });
+      });
+      document.querySelectorAll("[data-theme-tab]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          activeTab = button.getAttribute("data-theme-tab");
+          document.querySelectorAll("[data-theme-tab]").forEach(function (tab) { tab.setAttribute("aria-selected", String(tab === button)); });
+          renderThemeControls();
+        });
+      });
+      document.querySelectorAll("[data-edit-mode]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          editMode = button.getAttribute("data-edit-mode");
+          document.querySelectorAll("[data-edit-mode]").forEach(function (item) { item.setAttribute("aria-pressed", String(item === button)); });
+          renderThemeControls();
+          updateThemeUI();
+        });
+      });
+      document.getElementById("theme-search").addEventListener("input", renderThemeControls);
+      document.querySelectorAll("[data-preview-view]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          previewView = button.getAttribute("data-preview-view");
+          renderPreview(previewView);
+        });
+      });
+      document.querySelectorAll("[data-preset]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          commitWhole(presetTheme(button.getAttribute("data-preset")), "预设已应用并保存");
+          showToast("已应用预设：" + button.textContent.trim());
+        });
+      });
+      document.querySelectorAll("[data-action]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          var action = button.getAttribute("data-action");
+          if (action === "toggle-nav") document.body.classList.toggle("nav-open");
+          if (action === "open-theme") location.hash = "#/theme";
+          if (action === "undo") undo();
+          if (action === "redo") redo();
+          if (action === "reset-theme") commitWhole(normalizeTheme(null), "主题已重置并保存");
+          if (action === "open-export") openDialog(false);
+          if (action === "open-import") openDialog(true);
+          if (action === "close-dialog") document.getElementById("theme-dialog").close();
+          if (action === "copy-theme") copyTheme();
+          if (action === "apply-import") importTheme();
+          if (action === "export-download") exportTheme();
+        });
+      });
+      window.addEventListener("hashchange", function () { setRoute(location.hash.replace("#/", "") || "overview"); });
+      window.addEventListener("storage", function (event) {
+        if (event.key !== STORAGE_KEY || !event.newValue) return;
+        try {
+          var parsed = JSON.parse(event.newValue);
+          if (!isThemePayload(parsed)) return;
+          theme = normalizeTheme(parsed);
+          applyTheme();
+          renderThemeControls();
+          updateThemeUI();
+          showToast("已同步其他标签页的主题修改");
+        } catch (error) {}
+      });
+      if (window.matchMedia) {
+        var media = window.matchMedia("(prefers-color-scheme: dark)");
+        if (media.addEventListener) media.addEventListener("change", function () { if (theme.mode === "auto") applyTheme(); });
+      }
+      applyTheme();
+      setRoute(location.hash.replace("#/", "") || "overview");
+    }());
+  </script>
+</body>
+</html>

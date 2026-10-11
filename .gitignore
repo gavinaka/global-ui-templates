@@ -1,0 +1,10 @@
+node_modules/
+.git/
+build/
+dist/
+*.pem
+.env
+auth.json
+*.zip
+*.rar
+*.7z
